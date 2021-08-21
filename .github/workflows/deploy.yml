@@ -49,7 +49,6 @@ jobs:
           ls
           cp  web-screenshot-service .deploy/
       - name: 上传编译产物到COS
-        uses: TencentCloud/cos-action@v1
         run: |
           chmod 765 -R ./bin/
           ./bin/htool-cli cos --method upload --key hdmin_cube/app.jar --path ./build/HdminLowCode-latest.jar --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
