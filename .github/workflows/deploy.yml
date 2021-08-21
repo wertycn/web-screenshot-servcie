@@ -64,7 +64,7 @@ jobs:
           key: ${{ secrets.DEPLOY_HOST_SSH }}
           port: 22
           script: |
-            mkidr -p /docker/web-screenshot
+            mkdir -p /docker/web-screenshot
             htool-cli cos --method download --key web-screenshot/web-screenshot-service --path /docker/web-screenshot/web-screenshot-service --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
             htool-cli cos --method download --key web-screenshot/Dockerfile --path /docker/web-screenshot/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
             htool-cli cos --method download --key web-screenshot/deploy.sh --path /docker/web-screenshot/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
