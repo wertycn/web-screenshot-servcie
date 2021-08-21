@@ -33,8 +33,8 @@ function ClearNode(){
 ClearNode $DOCKER_NODE_NAME
 
 echo "about to be executed:"
-echo "docker run -d $DOCKER_RUN_CUSTOM_PARAM --name $DOCKER_NODE_NAME  $IMAGE_NAME"
-docker run -d $DOCKER_RUN_CUSTOM_PARAM --name $DOCKER_NODE_NAME  $IMAGE_NAME
+echo "docker run -d $DOCKER_RUN_CUSTOM_PARAM --name $DOCKER_NODE_NAME  $DOCKER_IMAGE_NAME"
+docker run -d $DOCKER_RUN_CUSTOM_PARAM --name $DOCKER_NODE_NAME  $DOCKER_IMAGE_NAME
 if [[ $? -ne 0 ]];then
   echo "start docker node failed! exit status [$?]"
   exit $?
