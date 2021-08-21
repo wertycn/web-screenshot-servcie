@@ -29,6 +29,6 @@ build/
 
 ### VS Code ###
 .vscode/
-screenshots/**
+screenshots/
 ### 配置文件不共享 ###
 #src/main/resources/application.yaml
