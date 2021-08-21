@@ -29,6 +29,7 @@ func ScreenShots(c *gin.Context) {
 	if err != nil {
 		resp.Msg = "capture screenshot failed:" + err.Error()
 		c.JSON(200, resp)
+		return
 	}
 
 	resp.Code = 0

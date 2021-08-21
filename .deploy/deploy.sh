@@ -2,7 +2,7 @@
 
 WORKER_DIR=/docker/web-screenshot
 DOCKER_IMAGE_NAME=debug.icu/web-screenshot-service:latest
-DOCKER_RUN_CUSTOM_PARAM="-v /docker/web-screenshot:/opt/web-screenshot -p 8500:8500"
+DOCKER_RUN_CUSTOM_PARAM=" -p 8500:1920"
 DOCKER_NODE_NAME=web-screenshot
 
 

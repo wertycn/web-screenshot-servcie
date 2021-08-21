@@ -26,6 +26,7 @@ func main() {
 		c.String(http.StatusOK, "Hello World!")
 	})
 
+	// TODO: 生成位置配置化，输出文件可直接访问。。。
 	r.GET("/screen", Controller.ScreenShots)
 	r.Run("0.0.0.0:1920")
 }
