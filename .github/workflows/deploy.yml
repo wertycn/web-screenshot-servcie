@@ -54,6 +54,7 @@ jobs:
           ./bin/htool-cli cos --method upload --key web-screenshot/web-screenshot --path web-screenshot --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           ./bin/htool-cli cos --method upload --key web-screenshot/Dockerfile --path .deploy/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           ./bin/htool-cli cos --method upload --key web-screenshot/deploy.sh --path .deploy/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          history
       - name: 部署服务
         uses: appleboy/ssh-action@master
         with:
