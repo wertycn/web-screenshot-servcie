@@ -44,7 +44,7 @@ jobs:
 #          restore-keys: ${{ runner.os }}-m2
       - name: 源码编译
         run: |
-          go build
+          go build -o  web-screenshot-service
           mkdir build
           ls
           cp  web-screenshot-service .deploy/
