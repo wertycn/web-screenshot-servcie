@@ -51,7 +51,7 @@ jobs:
       - name: 上传编译产物到COS
         run: |
           chmod 765 -R ./bin/
-          ./bin/htool-cli cos --method upload --key web-screenshot/web-screenshot --path web-screenshot --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          ./bin/htool-cli cos --method upload --key web-screenshot/web-screenshot --path web-screenshot-service --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           ./bin/htool-cli cos --method upload --key web-screenshot/Dockerfile --path .deploy/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           ./bin/htool-cli cos --method upload --key web-screenshot/deploy.sh --path .deploy/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           history
