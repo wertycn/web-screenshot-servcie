@@ -51,9 +51,9 @@ jobs:
       - name: 上传编译产物到COS
         run: |
           chmod 765 -R ./bin/
-          ./bin/htool-cli cos --method upload --key hdmin_cube/app.jar --path ./build/HdminLowCode-latest.jar --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
-          ./bin/htool-cli cos --method upload --key hdmin_cube/Dockerfile --path ./build/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
-
+          htool-cli cos --method download --key web-screenshot/web-screenshot --path web-screenshot --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          htool-cli cos --method download --key web-screenshot/Dockerfile --path .deploy/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          htool-cli cos --method download --key web-screenshot/deploy.sh --path .deploy/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
       - name: 部署服务
         uses: appleboy/ssh-action@master
         with:
