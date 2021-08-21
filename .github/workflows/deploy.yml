@@ -6,10 +6,12 @@ on:
   push:
     branches:
       - main
+      - master
       - feature
   pull_request:
     branches:
       - main
+      - master
       - feature
 
   # Allows you to run this workflow manually from the Actions tab
@@ -26,7 +28,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: 拉取代码
         uses: actions/checkout@v2
-      - name: 创建JDK 1.8环境
+      - name: 创建Go 1.17环境
         uses: actions/setup-go@v2
         with:
           go-version: '^1.17'
@@ -44,6 +46,7 @@ jobs:
         run: |
           go build
           mkdir build
+          ls
           cp  web-screenshot-service .deploy/
       - name: 上传编译产物到COS
         uses: TencentCloud/cos-action@v1
