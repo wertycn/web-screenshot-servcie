@@ -33,8 +33,6 @@ jobs:
       - run: |
           go version
           echo $GOPATH
-
-
       # Runs a single command using the runners shell
 #      - name: 依赖缓存配置
 #        uses: actions/cache@v2
