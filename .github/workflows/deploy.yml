@@ -1,0 +1,71 @@
+name: AutoDeploy
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - main
+      - feature
+  pull_request:
+    branches:
+      - main
+      - feature
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build_deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: 拉取代码
+        uses: actions/checkout@v2
+      - name: 创建JDK 1.8环境
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17'
+      - run: |
+          go version
+          echo $GOPATH
+
+
+      # Runs a single command using the runners shell
+#      - name: 依赖缓存配置
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.m2
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
+      - name: 源码编译
+        run: |
+          go build
+          mkdir build
+          cp  web-screenshot-service .deploy/
+      - name: 上传编译产物到COS
+        uses: TencentCloud/cos-action@v1
+        with:
+          secret_id: ${{ secrets.TENCENT_COS_AK }}
+          secret_key: ${{ secrets.TENCENT_COS_SK }}
+          cos_bucket: ${{ secrets.TENCENT_COS_BUCKET }}
+          cos_region: ${{ secrets.TENCENT_COS_REGION }}
+          local_path: .deploy/
+          remote_path: web-screenshot/
+
+      - name: 部署服务
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_HOST_USERNAME }}
+          key: ${{ secrets.DEPLOY_HOST_SSH }}
+          port: 22
+          script: |
+            htool-cli cos --method download --key web-screenshot/web-screenshot --path /docker/web-screenshot/web-screenshot --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+            htool-cli cos --method download --key web-screenshot/Dockerfile --path /docker/web-screenshot/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+            htool-cli cos --method download --key web-screenshot/deploy.sh --path /docker/web-screenshot/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+            bash /docker/web-screenshot/deploy.sh
