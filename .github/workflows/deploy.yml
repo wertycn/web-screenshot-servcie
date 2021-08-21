@@ -50,13 +50,10 @@ jobs:
           cp  web-screenshot-service .deploy/
       - name: 上传编译产物到COS
         uses: TencentCloud/cos-action@v1
-        with:
-          secret_id: ${{ secrets.TENCENT_COS_AK }}
-          secret_key: ${{ secrets.TENCENT_COS_SK }}
-          cos_bucket: ${{ secrets.TENCENT_COS_BUCKET }}
-          cos_region: ${{ secrets.TENCENT_COS_REGION }}
-          local_path: .deploy/
-          remote_path: web-screenshot/
+        run: |
+          chmod 765 -R ./bin/
+          ./bin/htool-cli cos --method upload --key hdmin_cube/app.jar --path ./build/HdminLowCode-latest.jar --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          ./bin/htool-cli cos --method upload --key hdmin_cube/Dockerfile --path ./build/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
 
       - name: 部署服务
         uses: appleboy/ssh-action@master
