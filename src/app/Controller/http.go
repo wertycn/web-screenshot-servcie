@@ -36,3 +36,12 @@ func ScreenShots(c *gin.Context) {
 	c.JSON(200, resp)
 
 }
+
+func GetDeviceList(c *gin.Context) {
+	var resp Resp
+
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data = Service.GetDeviceList()
+	c.JSON(200, resp)
+}

@@ -40,11 +40,17 @@ func setOutputDir(dir string) {
 
 }
 
-func CaptureScreenshot(url string) (string, error) {
+type ScreenshotRes struct {
+	ImageUrl string `json:"image_url,omitempty"`
+	Device   string `json:"device,omitempty"`
+}
+
+func CaptureScreenshot(url string) (ScreenshotRes, error) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	filename :=  util.GetMd5(url+timestamp) + ".png"
+	filename := util.GetMd5(url+timestamp) + ".png"
 	savePath := outputDir + filename
 	log.WithFields(log.Fields{"url": url, "savePath": savePath}).Info("request Capture Screenshot")
+	var res ScreenshotRes
 
 	var captureByte []byte
 	if err := chromedp.Run(
@@ -54,15 +60,17 @@ func CaptureScreenshot(url string) (string, error) {
 		chromedp.CaptureScreenshot(&captureByte),
 	); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
-		return "", err
+		return res, err
 	}
 	if err := ioutil.WriteFile(savePath, captureByte, 0777); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
-		return "", err
+		return res, err
 
 	}
+	res.ImageUrl = formatUrl(filename)
 
-	return formatUrl(filename), nil
+	res.Device = device.IPhone8Plus.String()
+	return res, nil
 }
 
 func formatUrl(path string) string {

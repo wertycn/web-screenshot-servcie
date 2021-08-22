@@ -29,6 +29,7 @@ func main() {
 	})
 
 	r.GET("/screen", Controller.ScreenShots)
+	r.GET("/screen/device", Controller.GetDeviceList)
 	r.StaticFS(conf.Conf.String("gin::output_route"), http.Dir(conf.Conf.String("gin::output_dir")))
 	r.Run("0.0.0.0:1920")
 }
