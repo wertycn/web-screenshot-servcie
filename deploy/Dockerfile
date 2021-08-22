@@ -1,4 +1,4 @@
-FROM chromedp/headless-shell:latest
+FROM debug.icu/chromedp-zh:latest
 WORKDIR /opt/web-screenshot
 MAINTAINER debug.icu
 ADD ./ /opt/web-screenshot
