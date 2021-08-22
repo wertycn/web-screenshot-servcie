@@ -33,28 +33,25 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '^1.17'
-      - run: |
-          go version
-          echo $GOPATH
       # Runs a single command using the runners shell
-#      - name: 依赖缓存配置
-#        uses: actions/cache@v2
-#        with:
-#          path: ~/.m2
-#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: ${{ runner.os }}-m2
+      - name: 编译缓存配置
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/go
+          key: ${{ runner.os }}-gopath
+          restore-keys:  ${{ runner.os }}-gopath
       - name: 源码编译
         run: |
           go build -o  web-screenshot-service
           mkdir build
           ls
-          cp  web-screenshot-service .deploy/
+          cp  web-screenshot-service deploy/
       - name: 上传编译产物到COS
         run: |
           chmod 765 -R ./bin/
           ./bin/htool-cli cos --method upload --key web-screenshot/web-screenshot-service --path web-screenshot-service --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
-          ./bin/htool-cli cos --method upload --key web-screenshot/Dockerfile --path .deploy/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
-          ./bin/htool-cli cos --method upload --key web-screenshot/deploy.sh --path .deploy/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          ./bin/htool-cli cos --method upload --key web-screenshot/Dockerfile --path deploy/Dockerfile --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
+          ./bin/htool-cli cos --method upload --key web-screenshot/deploy.sh --path deploy/deploy.sh --sk ${{ secrets.TENCENT_COS_SK }} --ak  ${{ secrets.TENCENT_COS_AK }} --url ${{ secrets.TENCENT_COS_URL }}
           history
       - name: 部署服务
         uses: appleboy/ssh-action@master
