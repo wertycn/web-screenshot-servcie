@@ -30,5 +30,6 @@ build/
 ### VS Code ###
 .vscode/
 screenshots/
+output/
 ### 配置文件不共享 ###
 #src/main/resources/application.yaml
