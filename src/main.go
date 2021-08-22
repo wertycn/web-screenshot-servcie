@@ -8,15 +8,17 @@ import (
 	"net/http"
 	"web-srceenshot-service/app/Controller"
 	"web-srceenshot-service/app/Service"
+	conf "web-srceenshot-service/lib/conf"
 )
 
 func main() {
-	log.Info("web srceenshots service start ...")
+	log.Info("web screenshots service start ...")
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 	Service.RegisterContext(ctx)
-
 	log.Info("chromeDP init complete")
+	conf.LoadConfig("conf/app.ini")
+	Service.RegisterConf()
 
 	log.Info("gin route register start ...")
 	r := gin.Default()
@@ -26,8 +28,8 @@ func main() {
 		c.String(http.StatusOK, "Hello World!")
 	})
 
-	// TODO: 生成位置配置化，输出文件可直接访问。。。
 	r.GET("/screen", Controller.ScreenShots)
+	r.StaticFS(conf.Conf.String("gin::output_route"), http.Dir(conf.Conf.String("gin::output_dir")))
 	r.Run("0.0.0.0:1920")
 }
 
@@ -49,4 +51,3 @@ func Cors() gin.HandlerFunc {
 		c.Next()
 	}
 }
-

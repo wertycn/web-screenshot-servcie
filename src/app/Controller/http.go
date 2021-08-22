@@ -5,9 +5,7 @@ import (
 	"web-srceenshot-service/app/Service"
 )
 
-/**
- * 定义Http接口JOSN响应数据结构
- */
+// Resp 接口响应对象
 type Resp struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg,omitempty"`
