@@ -2,7 +2,6 @@ package Service
 
 import (
 	"github.com/chromedp/chromedp"
-	"github.com/chromedp/chromedp/device"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -45,21 +44,21 @@ type ScreenshotRes struct {
 	Device   string `json:"device,omitempty"`
 }
 
-func CaptureScreenshot(url string) (ScreenshotRes, error) {
+func CaptureScreenshot(url string, deviceName string) (ScreenshotRes, error) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 	filename := util.GetMd5(url+timestamp) + ".png"
 	savePath := outputDir + filename
-	log.WithFields(log.Fields{"url": url, "savePath": savePath}).Info("request Capture Screenshot")
+	device := GetDevice(deviceName)
+	log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Info("request Capture Screenshot")
 	var res ScreenshotRes
-
 	var captureByte []byte
 	if err := chromedp.Run(
 		GetChromeContext(),
-		chromedp.Emulate(device.IPhone8Plus),
+		chromedp.Emulate(device),
 		chromedp.Navigate(url),
 		chromedp.CaptureScreenshot(&captureByte),
 	); err != nil {
-		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
+		log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Error(err)
 		return res, err
 	}
 	if err := ioutil.WriteFile(savePath, captureByte, 0777); err != nil {
@@ -69,7 +68,7 @@ func CaptureScreenshot(url string) (ScreenshotRes, error) {
 	}
 	res.ImageUrl = formatUrl(filename)
 
-	res.Device = device.IPhone8Plus.String()
+	res.Device = device.Device().String()
 	return res, nil
 }
 

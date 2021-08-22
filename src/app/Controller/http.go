@@ -22,8 +22,12 @@ func ScreenShots(c *gin.Context) {
 		c.JSON(200, resp)
 		return
 	}
+	device := c.Request.FormValue("device")
+	if device == "DEFAULT" || device == "" {
+		device = "default"
+	}
 
-	screenshot, err := Service.CaptureScreenshot(url)
+	screenshot, err := Service.CaptureScreenshot(url,device)
 	if err != nil {
 		resp.Msg = "capture screenshot failed:" + err.Error()
 		c.JSON(200, resp)

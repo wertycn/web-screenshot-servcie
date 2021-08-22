@@ -255,7 +255,10 @@ func initDeviceMap() {
 }
 
 func GetDevice(name string) chromedp.Device {
-	return deviceMap[name]
+	if _, ok := deviceMap[name]; ok {
+		return deviceMap[name]
+	}
+	return device.IPhone8
 }
 
 func GetDeviceList() []string {
