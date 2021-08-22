@@ -42,10 +42,12 @@ jobs:
           restore-keys:  ${{ runner.os }}-gopath
       - name: 源码编译
         run: |
+          cd src
           go build -o  web-screenshot-service
           mkdir build
           ls
-          cp  web-screenshot-service deploy/
+          cp  web-screenshot-service ../deploy/
+          cd ../
       - name: 上传编译产物到COS
         run: |
           chmod 765 -R ./bin/
