@@ -18,6 +18,10 @@ func RegisterConf() {
 	setOutputDir(conf.Conf.String("gin::output_dir"))
 	domain = conf.Conf.String("gin::domain")
 	route = conf.Conf.String("gin::output_route")
+	InitTask(
+		conf.Conf.DefaultInt("task::consumer_number", 30),
+		conf.Conf.DefaultInt("task::wait_queue_size", 10000),
+	)
 }
 func setOutputDir(dir string) {
 	log.Info("register output dir is " + dir)
@@ -88,7 +92,23 @@ func CaptureScreenshot(url string, deviceName string) (ScreenshotRes, error) {
 func CaptureScreenshotPlus(query CapQuery) (ScreenshotRes, error) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 	url := query.Url
-	filename := util.GetMd5(url+timestamp) + ".png"
+	taskId := util.GetMd5(url + timestamp)
+	return doScreenshotPlus(query, taskId)
+}
+
+// AsyncCaptureScreenshotPlus 异步调用
+func AsyncCaptureScreenshotPlus(query CapQuery) (TaskResp, error) {
+	task, err := CreateTask(query)
+	if err != nil {
+		var emptyRes TaskResp
+		return emptyRes, err
+	}
+	return task, nil
+}
+
+func doScreenshotPlus(query CapQuery, taskId string) (ScreenshotRes, error) {
+	url := query.Url
+	filename := taskId + ".png"
 	savePath := outputDir + filename
 	deviceName := query.Device
 	device := GetDevice(deviceName)
@@ -120,8 +140,9 @@ func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 		tasks = append(tasks, chromedp.WaitVisible(query.RenderElement, chromedp.ByQuery))
 	}
 	if query.RenderStrategy == "delay" {
-		log.Info("delay sleep...")
-		tasks = append(tasks, chromedp.Sleep(10*time.Second))
+		log.Infof("delay sleep %s ms ...", query.RenderDelay)
+		duration := time.Duration(query.RenderDelay) * time.Millisecond
+		tasks = append(tasks, chromedp.Sleep(duration))
 	}
 	// 截图模式
 	if query.CapMode == "element" {

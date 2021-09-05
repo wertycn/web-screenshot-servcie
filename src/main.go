@@ -30,6 +30,8 @@ func main() {
 
 	r.GET("/screen", Controller.ScreenShots)
 	r.POST("/screen/plus", Controller.ScreenShotsPlus)
+	r.POST("/screen/plus/async", Controller.AsyncScreenShotsPlus)
+	r.GET("/screen/plus/async_res", Controller.GetTaskResp)
 	r.GET("/screen/device", Controller.GetDeviceList)
 	r.StaticFS(conf.Conf.String("gin::output_route"), http.Dir(conf.Conf.String("gin::output_dir")))
 	r.Run("0.0.0.0:1920")
