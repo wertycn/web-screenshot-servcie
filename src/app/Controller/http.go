@@ -116,7 +116,7 @@ func GetTaskResp(c *gin.Context) {
 	resp.Code = 0
 	status := taskResp.Status
 	resp.Data = taskResp
-	if status == "queue" || status == "runing" {
+	if status == "wait" || status == "process" {
 		c.JSON(202, resp)
 		return
 	}

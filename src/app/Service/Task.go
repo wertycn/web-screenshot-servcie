@@ -16,6 +16,7 @@ type TaskResp struct {
 	TaskId        string        `json:"task_id"`
 	Task          Task          `json:"task"`
 	Status        string        `json:"status"`
+	Step          string        `json:"step"`
 	Message       string        `json:"message"`
 	ScreenshotRes ScreenshotRes `json:"screenshot_res"`
 }
@@ -67,12 +68,13 @@ func CreateTask(query CapQuery) (TaskResp, error) {
 	var taskResp TaskResp
 	taskResp.Task = task
 	taskResp.TaskId = taskId
+	taskResp.Step = "queue"
 	if len(waitQueue) >= cap(waitQueue)-10 {
 		taskResp.Status = "failed"
 		log.Errorf("create screen task failed: %v", query)
 		return taskResp, errors.New("任务执行等待队列待执行任务数即将达到上限")
 	}
-	taskResp.Status = "queue"
+	taskResp.Status = "wait"
 	// 将任务加入到任务队列
 	taskRespMap[taskId] = taskResp
 	waitQueue <- task
@@ -91,7 +93,8 @@ func ConsumeQueue() {
 func handlerTask(task Task) {
 	log.Infof("start handler task(%v)", task)
 	resp := taskRespMap[task.Id]
-	resp.Status = "runing"
+	resp.Status = "process"
+	resp.Step = "runing"
 	taskRespMap[task.Id] = resp
 	screen, err := doScreenshotPlus(task.Query, task.Id)
 	<-consumer
@@ -103,7 +106,8 @@ func handlerTask(task Task) {
 		return
 	}
 	resp.ScreenshotRes = screen
-	resp.Status = "success"
+	resp.Status = "finish"
+	resp.Step = "complete"
 	taskRespMap[task.Id] = resp
 	log.Infof("task(%v) handler success", task)
 }
