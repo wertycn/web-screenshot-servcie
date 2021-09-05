@@ -15,6 +15,7 @@ type Task struct {
 type TaskResp struct {
 	TaskId        string        `json:"task_id"`
 	Task          Task          `json:"task"`
+	Finish        bool          `json:"finish"`
 	Status        string        `json:"status"`
 	Step          string        `json:"step"`
 	Message       string        `json:"message"`
@@ -69,8 +70,10 @@ func CreateTask(query CapQuery) (TaskResp, error) {
 	taskResp.Task = task
 	taskResp.TaskId = taskId
 	taskResp.Step = "queue"
+	taskResp.Finish = false
 	if len(waitQueue) >= cap(waitQueue)-10 {
 		taskResp.Status = "failed"
+		taskResp.Finish = true
 		log.Errorf("create screen task failed: %v", query)
 		return taskResp, errors.New("任务执行等待队列待执行任务数即将达到上限")
 	}
@@ -98,6 +101,7 @@ func handlerTask(task Task) {
 	taskRespMap[task.Id] = resp
 	screen, err := doScreenshotPlus(task.Query, task.Id)
 	<-consumer
+	resp.Finish = true
 	if err != nil {
 		log.Warnf("task %s runing failed:%s", task.Id, err.Error())
 		resp.Status = "failed"
