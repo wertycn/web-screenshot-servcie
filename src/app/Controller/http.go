@@ -2,6 +2,7 @@ package Controller
 
 import (
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"web-srceenshot-service/app/Service"
 )
 
@@ -46,6 +47,7 @@ func ScreenShotsPlus(c *gin.Context) {
 
 	var query Service.CapQuery
 	err := c.ShouldBindJSON(&query)
+	log.Info(query)
 	if err != nil {
 		resp.Msg = "参数解析错误:" + err.Error()
 		c.JSON(200, resp)

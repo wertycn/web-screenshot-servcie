@@ -112,6 +112,9 @@ func CaptureScreenshotPlus(query CapQuery) (ScreenshotRes, error) {
 
 func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 	tasks := chromedp.Tasks{}
+	// UA 配置
+	tasks = append(tasks, chromedp.Emulate(GetDevice(query.Device)))
+	// 渲染策略任务
 	tasks = append(tasks, chromedp.Navigate(query.Url))
 	if query.RenderStrategy == "element" {
 		tasks = append(tasks, chromedp.WaitVisible(query.RenderElement, chromedp.ByQuery))
@@ -120,6 +123,7 @@ func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 		log.Info("delay sleep...")
 		tasks = append(tasks, chromedp.Sleep(10*time.Second))
 	}
+	// 截图模式
 	if query.CapMode == "element" {
 		tasks = append(tasks, chromedp.WaitVisible(query.CapElement, chromedp.ByQuery))
 		tasks = append(tasks, chromedp.Screenshot(query.CapElement, captureByte))
@@ -130,6 +134,7 @@ func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 	if query.CapMode == "normal" || query.CapMode == "default" {
 		tasks = append(tasks, chromedp.CaptureScreenshot(captureByte))
 	}
+
 	return tasks
 
 }
