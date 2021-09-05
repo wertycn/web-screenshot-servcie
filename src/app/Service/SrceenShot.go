@@ -41,7 +41,23 @@ func setOutputDir(dir string) {
 
 type ScreenshotRes struct {
 	ImageUrl string `json:"image_url,omitempty"`
-	Device   string `json:"device,omitempty"`
+}
+
+type CapQuery struct {
+	// 请求地址
+	Url string `json:"url,omitempty"`
+	// 设备
+	Device string `json:"device,omitempty"`
+	// 截图模式 full/element/normal  默认normal
+	CapMode string `json:"cap_mode,omitempty"`
+	// 截图元素选择器
+	CapElement string `json:"cap_element,omitempty"`
+	// 渲染策略
+	RenderStrategy string `json:"render_strategy,omitempty"`
+	// 渲染元素选择器
+	RenderElement string `json:"render_element,omitempty"`
+	// 等待渲染延迟时长
+	RenderDelay int64 `json:"render_delay,omitempty"`
 }
 
 func CaptureScreenshot(url string, deviceName string) (ScreenshotRes, error) {
@@ -64,12 +80,58 @@ func CaptureScreenshot(url string, deviceName string) (ScreenshotRes, error) {
 	if err := ioutil.WriteFile(savePath, captureByte, 0777); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
 		return res, err
-
 	}
 	res.ImageUrl = formatUrl(filename)
-
-	res.Device = device.Device().String()
 	return res, nil
+}
+
+func CaptureScreenshotPlus(query CapQuery) (ScreenshotRes, error) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	url := query.Url
+	filename := util.GetMd5(url+timestamp) + ".png"
+	savePath := outputDir + filename
+	deviceName := query.Device
+	device := GetDevice(deviceName)
+	log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Info("request Capture Screenshot")
+	var res ScreenshotRes
+	var captureByte []byte
+	if err := chromedp.Run(
+		GetChromeContext(),
+		buildTask(query, &captureByte),
+	); err != nil {
+		log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Error(err)
+		return res, err
+	}
+	if err := ioutil.WriteFile(savePath, captureByte, 0777); err != nil {
+		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
+		return res, err
+	}
+	res.ImageUrl = formatUrl(filename)
+	return res, nil
+}
+
+func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
+	tasks := chromedp.Tasks{}
+	tasks = append(tasks, chromedp.Navigate(query.Url))
+	if query.RenderStrategy == "element" {
+		tasks = append(tasks, chromedp.WaitVisible(query.RenderElement, chromedp.ByQuery))
+	}
+	if query.RenderStrategy == "delay" {
+		log.Info("delay sleep...")
+		tasks = append(tasks, chromedp.Sleep(10*time.Second))
+	}
+	if query.CapMode == "element" {
+		tasks = append(tasks, chromedp.WaitVisible(query.CapElement, chromedp.ByQuery))
+		tasks = append(tasks, chromedp.Screenshot(query.CapElement, captureByte))
+	}
+	if query.CapMode == "full" {
+		tasks = append(tasks, chromedp.FullScreenshot(captureByte, 100))
+	}
+	if query.CapMode == "normal" || query.CapMode == "default" {
+		tasks = append(tasks, chromedp.CaptureScreenshot(captureByte))
+	}
+	return tasks
+
 }
 
 func formatUrl(path string) string {

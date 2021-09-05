@@ -27,7 +27,32 @@ func ScreenShots(c *gin.Context) {
 		device = "default"
 	}
 
-	screenshot, err := Service.CaptureScreenshot(url,device)
+	screenshot, err := Service.CaptureScreenshot(url, device)
+	if err != nil {
+		resp.Msg = "capture screenshot failed:" + err.Error()
+		c.JSON(200, resp)
+		return
+	}
+
+	resp.Code = 0
+	resp.Msg = "success"
+	resp.Data = screenshot
+	c.JSON(200, resp)
+
+}
+func ScreenShotsPlus(c *gin.Context) {
+	var resp Resp
+	resp.Code = -1
+
+	var query Service.CapQuery
+	err := c.ShouldBindJSON(&query)
+	if err != nil {
+		resp.Msg = "参数解析错误:" + err.Error()
+		c.JSON(200, resp)
+		return
+	}
+
+	screenshot, err := Service.CaptureScreenshotPlus(query)
 	if err != nil {
 		resp.Msg = "capture screenshot failed:" + err.Error()
 		c.JSON(200, resp)

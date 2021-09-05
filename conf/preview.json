@@ -1,0 +1,148 @@
+{
+  "data": {
+    "selector_doc": "https://blog.csdn.net/weixin_43277055/article/details/85319676"
+  },
+  "title": "服务端截图演示",
+  "type": "page",
+  "body": [
+    {
+      "clearValueOnHidden": true,
+      "api": {
+        "method": "post",
+        "url": "https://app.werty.cn/screen"
+      },
+      "type": "form",
+      "body": [
+        {
+          "name": "url",
+          "description": "默认地址为行业对比详情页url",
+          "label": "请求地址",
+          "type": "input-text",
+          "value": "https://basic.10jqka.com.cn/basicph/industryComparison.html?code=003035&marketid=33&gphonepredraw=true&fontzoom=no",
+          "required": true
+        },
+        {
+          "name": "cap_mode",
+          "options": [
+            {
+              "label": "可视区域",
+              "value": "normal"
+            },
+            {
+              "label": "网页全屏",
+              "value": "full"
+            },
+            {
+              "label": "指定元素",
+              "value": "element"
+            }
+          ],
+          "label": "截图模式",
+          "type": "radios",
+          "value": "normal",
+          "required": true
+        },
+        {
+          "hiddenOn": "data.cap_mode != 'element'",
+          "name": "cap_element",
+          "description": "截图模式为指定元素时需要输入元素对应的唯一选择器(Selector),获取方式可以参考：${selector_doc}",
+          "label": "截图元素Selector",
+          "type": "input-text",
+          "value": "",
+          "required": true
+        },
+        {
+          "name": "render_strategy",
+          "options": [
+            {
+              "label": "默认策略",
+              "value": "default"
+            },
+            {
+              "label": "延迟等待",
+              "value": "delay"
+            },
+            {
+              "label": "指定元素可见",
+              "value": "element"
+            }
+          ],
+          "description": "默认策略由浏览器判断页面是否加载完成，适用标准简单页面",
+          "label": "渲染策略",
+          "type": "radios",
+          "value": "default",
+          "required": true
+        },
+        {
+          "hiddenOn": "data.render_strategy != 'element'",
+          "name": "render_element",
+          "description": "渲染策略为指定元素可见时需要输入元素对应的唯一选择器(Selector),获取方式可以参考：${selector_doc}",
+          "label": "渲染策略元素Selector",
+          "type": "input-text",
+          "value": "",
+          "required": true
+        },
+        {
+          "hiddenOn": "data.render_strategy != 'delay'",
+          "name": "delay",
+          "description": "渲染策略为延迟等待时需要输入延迟时长(ms)",
+          "validationErrors": {
+            "maximum": "延迟等待时间需小于10000ms",
+            "minimum": "延迟等待时间需大于等于100ms"
+          },
+          "label": "延迟时长(ms)",
+          "validations": {
+            "isNumeric": true,
+            "maximum": 10000,
+            "minimum": 100
+          },
+          "type": "input-text",
+          "value": "",
+          "required": true
+        },
+        {
+          "name": "device",
+          "options": [
+            {
+              "label": "IPhoneX",
+              "value": "IPhoneX"
+            },
+            {
+              "label": "IPhone11",
+              "value": "IPhone11"
+            },
+            {
+              "label": "IPad",
+              "value": "IPad"
+            },
+            {
+              "label": "IPhoneSE",
+              "value": "IPhoneSE"
+            },
+            {
+              "label": "Nexus10",
+              "value": "Nexus10"
+            },
+            {
+              "label": "NokiaLumia520",
+              "value": "NokiaLumia520"
+            }
+          ],
+          "label": "设备型号",
+          "type": "select",
+          "value": "IPhoneX"
+        },
+        {
+          "imageCaption": "",
+          "thumbMode": "cover",
+          "originalSrc": "${image}",
+          "name": "image_url",
+          "label": "截图结果预览",
+          "type": "static-image",
+          "title": "preview_image",
+          "enlargeAble": true
+        }
+      ]
+    }
+  ]
+}
