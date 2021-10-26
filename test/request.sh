@@ -1,0 +1,16 @@
+curl 'http://localhost:1920/screen/plus/async' \
+  -H 'Connection: keep-alive' \
+  -H 'sec-ch-ua: "Microsoft Edge";v="95", "Chromium";v="95", ";Not A Brand";v="99"' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Content-Type: application/json' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.30' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'Origin: https://app.werty.cn' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Referer: https://app.werty.cn/app/v2/index.html?app=screenshot_async' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
+  --data-raw '{"url":"https://cloud.tencent.com/","cap_mode":"full","render_strategy":"default","device":"IPhoneX"}' \
+  --compressed

@@ -1,9 +1,12 @@
 package Service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"time"
+	"web-srceenshot-service/lib"
 	"web-srceenshot-service/lib/util"
 )
 
@@ -52,6 +55,7 @@ func checkInit() {
 
 // 生成任务id
 func genTaskId(url string) string {
+	// todo : task_id 加上机器属性
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 	return util.GetMd5(url + timestamp)
 }
@@ -72,16 +76,26 @@ func CreateTask(query CapQuery) (TaskResp, error) {
 	taskResp.Step = "queue"
 	taskResp.Finish = false
 	if len(waitQueue) >= cap(waitQueue)-10 {
-		taskResp.Status = "failed"
+		taskResp.Status = "error"
 		taskResp.Finish = true
 		log.Errorf("create screen task failed: %v", query)
 		return taskResp, errors.New("任务执行等待队列待执行任务数即将达到上限")
 	}
 	taskResp.Status = "wait"
 	// 将任务加入到任务队列
-	taskRespMap[taskId] = taskResp
-	waitQueue <- task
+	appendTaskQueue(taskId, taskResp, task)
 	return taskResp, nil
+}
+
+func appendTaskQueue(taskId string, taskResp TaskResp, task Task) {
+	taskRespMap[taskId] = taskResp
+	content, _ := json.Marshal(taskResp)
+	value := fmt.Sprintf("%s", content)
+	lib.HashSet("data", taskId, value)
+	res := lib.HashGet("data", taskId)
+	log.Info("redis value :"+value)
+	log.Info("redis result :"+res)
+	waitQueue <- task
 }
 
 // 处理任务
@@ -104,7 +118,7 @@ func handlerTask(task Task) {
 	resp.Finish = true
 	if err != nil {
 		log.Warnf("task %s runing failed:%s", task.Id, err.Error())
-		resp.Status = "failed"
+		resp.Status = "error"
 		resp.Message = err.Error()
 		taskRespMap[task.Id] = resp
 		return

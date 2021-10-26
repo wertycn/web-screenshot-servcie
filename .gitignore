@@ -33,3 +33,6 @@ screenshots/
 output/
 ### 配置文件不共享 ###
 #src/main/resources/application.yaml
+conf/app_dev.ini
+conf/app_prod.ini
+conf/app.ini

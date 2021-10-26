@@ -2,10 +2,12 @@ package Service
 
 import (
 	"github.com/chromedp/chromedp"
+	"github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"time"
+	"web-srceenshot-service/lib"
 	"web-srceenshot-service/lib/conf"
 	"web-srceenshot-service/lib/util"
 )
@@ -13,7 +15,7 @@ import (
 var outputDir string
 var domain string
 var route string
-
+var redisClient *redis.Client
 func RegisterConf() {
 	setOutputDir(conf.Conf.String("gin::output_dir"))
 	domain = conf.Conf.String("gin::domain")
@@ -21,6 +23,12 @@ func RegisterConf() {
 	InitTask(
 		conf.Conf.DefaultInt("task::consumer_number", 30),
 		conf.Conf.DefaultInt("task::wait_queue_size", 10000),
+	)
+
+	redisClient = lib.CreateRedisClient(
+		conf.Conf.String("redis::ip"),
+		conf.Conf.String("redis::port"),
+		conf.Conf.String("redis::auth"),
 	)
 }
 func setOutputDir(dir string) {
@@ -117,7 +125,7 @@ func doScreenshotPlus(query CapQuery, taskId string) (ScreenshotRes, error) {
 	var captureByte []byte
 	if err := chromedp.Run(
 		GetChromeContext(),
-		buildTask(query, &captureByte),
+		buildTaskParam(query, &captureByte),
 	); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Error(err)
 		return res, err
@@ -130,7 +138,7 @@ func doScreenshotPlus(query CapQuery, taskId string) (ScreenshotRes, error) {
 	return res, nil
 }
 
-func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
+func buildTaskParam(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 	tasks := chromedp.Tasks{}
 	// UA 配置
 	tasks = append(tasks, chromedp.Emulate(GetDevice(query.Device)))
@@ -140,8 +148,9 @@ func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {
 		tasks = append(tasks, chromedp.WaitVisible(query.RenderElement, chromedp.ByQuery))
 	}
 	if query.RenderStrategy == "delay" {
-		log.Infof("delay sleep %s ms ...", query.RenderDelay)
+		log.Infof("delay sleep %d ms ...", query.RenderDelay)
 		duration := time.Duration(query.RenderDelay) * time.Millisecond
+		log.Info(duration)
 		tasks = append(tasks, chromedp.Sleep(duration))
 	}
 	// 截图模式

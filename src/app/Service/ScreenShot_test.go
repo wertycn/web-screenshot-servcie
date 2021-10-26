@@ -13,11 +13,11 @@ func TestCaptureScreenshotPlus(t *testing.T) {
 	defer cancel()
 	RegisterContext(ctx)
 	var query CapQuery
-	content := "{\"url\":\"https://basic.10jqka.com.cn/basicph/briefinfo.html?fromshare=1&code=300033&market_id=17&fontzoom=no&client_userid=xn8rh&share_hxapp=gsc&share_action=webpage_share.1&back_source=wxhy#/company\",\"cap_mode\":\"element\",\"render_strategy\":\"delay\",\"devic\":\"IPhoneX\",\"cap_element\":\"#scrollDom > div.business-analysis.basic-bgColor\",\"delay\":\"10000\",\"render_element\":\"#scrollDom > div.business-analysis.basic-bgColor\"}"
+	content := "{\"url\":\"https://basic.10jqka.com.cn/basicph/industryComparison.html?code=003035&marketid=33&gphonepredraw=true&fontzoom=no\",\"cap_mode\":\"normal\",\"render_strategy\":\"delay\",\"device\":\"IPhoneX\",\"delay\":\"5000\"}"
 	json.Unmarshal([]byte(content), &query)
 	//var captureByte []byte
 	//
-	//task := buildTask(query, &captureByte)
+	//task := buildTaskParam(query, &captureByte)
 	//
 	plus, err := CaptureScreenshotPlus(query)
 	if err != nil {
