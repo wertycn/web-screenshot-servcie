@@ -1,4 +1,4 @@
-FROM debug.icu/chromedp-zh:latest
+FROM debugicu/chromedp-zh:latest
 WORKDIR /opt/web-screenshot
 MAINTAINER debug.icu
 ADD ./ /opt/web-screenshot
