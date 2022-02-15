@@ -6,23 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
-	"web-srceenshot-service/lib/conf"
-	"web-srceenshot-service/lib/util"
+	"web-screenshot-service/lib/util"
 )
 
-var outputDir string
-var domain string
-var route string
-
-func RegisterConf() {
-	setOutputDir(conf.Conf.String("gin::output_dir"))
-	domain = conf.Conf.String("gin::domain")
-	route = conf.Conf.String("gin::output_route")
-	InitTask(
-		conf.Conf.DefaultInt("task::consumer_number", 30),
-		conf.Conf.DefaultInt("task::wait_queue_size", 10000),
-	)
-}
 func setOutputDir(dir string) {
 	log.Info("register output dir is " + dir)
 	outputDir = dir
@@ -49,19 +35,19 @@ type ScreenshotRes struct {
 
 type CapQuery struct {
 	// 请求地址
-	Url string `json:"url,omitempty"`
+	Url string `json:"url"`
 	// 设备
-	Device string `json:"device,omitempty"`
+	Device string `json:"device"`
 	// 截图模式 full/element/normal  默认normal
-	CapMode string `json:"cap_mode,omitempty"`
+	CapMode string `json:"cap_mode"`
 	// 截图元素选择器
-	CapElement string `json:"cap_element,omitempty"`
+	CapElement string `json:"cap_element"`
 	// 渲染策略
-	RenderStrategy string `json:"render_strategy,omitempty"`
+	RenderStrategy string `json:"render_strategy"`
 	// 渲染元素选择器
-	RenderElement string `json:"render_element,omitempty"`
+	RenderElement string `json:"render_element"`
 	// 等待渲染延迟时长
-	RenderDelay int64 `json:"render_delay,omitempty"`
+	RenderDelay int64 `json:"render_delay"`
 }
 
 func CaptureScreenshot(url string, deviceName string) (ScreenshotRes, error) {
@@ -115,19 +101,33 @@ func doScreenshotPlus(query CapQuery, taskId string) (ScreenshotRes, error) {
 	log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Info("request Capture Screenshot")
 	var res ScreenshotRes
 	var captureByte []byte
+	context, cancel := GetChromeTimeContext()
+	defer cancel()
 	if err := chromedp.Run(
-		GetChromeContext(),
+		context,
 		buildTask(query, &captureByte),
 	); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath, "device_name": deviceName, "device": device.Device().String()}).Error(err)
 		return res, err
 	}
+
 	if err := ioutil.WriteFile(savePath, captureByte, 0777); err != nil {
 		log.WithFields(log.Fields{"url": url, "savePath": savePath}).Error(err)
 		return res, err
 	}
-	res.ImageUrl = formatUrl(filename)
+
+	image, err := doImageUpload(savePath)
+	if err != nil {
+		return res, err
+	}
+
+	res.ImageUrl = image
 	return res, nil
+}
+
+func doImageUpload(filePath string) (string, error) {
+	// 图片上传资源服务器
+	return UploadImage(filePath)
 }
 
 func buildTask(query CapQuery, captureByte *[]byte) chromedp.Tasks {

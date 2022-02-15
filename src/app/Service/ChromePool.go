@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/device"
+	"time"
 )
 
 var ctx context.Context
@@ -11,12 +12,21 @@ var ctx context.Context
 var deviceMap = make(map[string]chromedp.Device)
 
 func RegisterContext(c context.Context) {
+
 	ctx = c
 	initDeviceMap()
 }
 
 func GetChromeContext() context.Context {
+	ctx, _ := chromedp.NewContext(context.Background())
+	context.WithTimeout(ctx, 30*time.Second)
 	return ctx
+}
+
+func GetChromeTimeContext() (context.Context, context.CancelFunc) {
+	ctx, cancel := chromedp.NewContext(context.Background())
+	context.WithTimeout(ctx, 30*time.Second)
+	return ctx,cancel
 }
 
 func initDeviceMap() {
@@ -252,6 +262,8 @@ func initDeviceMap() {
 	// Pixel2XLlandscape is the "Pixel 2 XL landscape" device.
 	deviceMap["Pixel2XLlandscape"] = device.Pixel2XLlandscape
 
+	//deviceMap["ths"] = device
+
 }
 
 func GetDevice(name string) chromedp.Device {
@@ -262,7 +274,7 @@ func GetDevice(name string) chromedp.Device {
 }
 
 func GetDeviceList() []string {
-	var deviceList  []string
+	var deviceList []string
 	for k, _ := range deviceMap {
 		deviceList = append(deviceList, k)
 	}

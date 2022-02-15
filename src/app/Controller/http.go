@@ -3,13 +3,13 @@ package Controller
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"web-srceenshot-service/app/Service"
+	"web-screenshot-service/app/Service"
 )
 
 // Resp 接口响应对象
 type Resp struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"msg,omitempty"`
+	Code int         `json:"status_code"`
+	Msg  string      `json:"status_msg,omitempty"`
 	Data interface{} `json:"data,omitempty"`
 }
 

@@ -1,21 +1,17 @@
 package main
 
 import (
-	"context"
-	"github.com/chromedp/chromedp"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"web-srceenshot-service/app/Controller"
-	"web-srceenshot-service/app/Service"
-	conf "web-srceenshot-service/lib/conf"
+	"web-screenshot-service/app/Controller"
+	"web-screenshot-service/app/Service"
+	conf "web-screenshot-service/lib/conf"
 )
 
 func main() {
 	log.Info("web screenshots service start ...")
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
-	Service.RegisterContext(ctx)
+
 	log.Info("chromeDP init complete")
 	conf.LoadConfig("conf/app.ini")
 	Service.RegisterConf()
@@ -28,8 +24,8 @@ func main() {
 		c.String(http.StatusOK, "Hello World!")
 	})
 
-	r.GET("/screen", Controller.ScreenShots)
-	r.POST("/screen/plus", Controller.ScreenShotsPlus)
+	r.GET("/screen/sync", Controller.ScreenShots)
+	r.POST("/screen/plus/sync", Controller.ScreenShotsPlus)
 	r.POST("/screen/plus/async", Controller.AsyncScreenShotsPlus)
 	r.GET("/screen/plus/async_res", Controller.GetTaskResp)
 	r.GET("/screen/device", Controller.GetDeviceList)
@@ -37,21 +33,21 @@ func main() {
 	r.Run("0.0.0.0:1920")
 }
 
+/*
+ * 跨域配置
+ */
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
-
-		// 可将将* 替换为指定的域名
-		c.Header("Access-Control-Allow-Origin", "*")
+		// 动态跨域支持
+		c.Header("Access-Control-Allow-Origin", c.Request.Header.Get("origin"))
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
 		c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
-
 		if method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
 		}
-
 		c.Next()
 	}
 }
