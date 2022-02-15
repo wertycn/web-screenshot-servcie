@@ -2,7 +2,7 @@
 DEPLOY_ACCESS_KEY=$1
 DEPLOY_API_URL=$2
 DEPLOY_VERSION=$3
-DEPLOY_SERVER_NAME=web-screenshot-service
+DEPLOY_SERVER_NAME=$4
 IMAGE_NAME=hkccr.ccs.tencentyun.com/debug.icu/$DEPLOY_SERVER_NAME
 
 curl -X PUT \
