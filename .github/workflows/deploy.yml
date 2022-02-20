@@ -107,7 +107,7 @@ jobs:
       - name: 等待镜像推送成功
         run: sleep 5
       - name: deploy to k8s by kuboard
-        uses: wertycn/kuboard-deploy-action@v1.0.0
+        uses: wertycn/kuboard-deploy-action@v1.0.1
         with:
           user: "wertycn"             # 'kuboard user name'
           access_key: "${{ secrets.DEPLOY_ACCESS_KEY }}"       # 'kuboard access key'
