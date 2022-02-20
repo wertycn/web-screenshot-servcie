@@ -106,7 +106,14 @@ jobs:
             hkccr.ccs.tencentyun.com/debug.icu/${{ env.PROJECT_NAME }}:latest
       - name: 等待镜像推送成功
         run: sleep 5
-      - name: 部署到K8S集群
-        run: |
-          chmod 765 deploy/deploy2k3s.sh
-          deploy/deploy2k3s.sh ${{ secrets.DEPLOY_ACCESS_KEY }} ${{ secrets.DEPLOY_API_URL }} ${{ github.sha }}	${{ env.PROJECT_NAME }}  
+      - name: deploy to k8s by kuboard
+        uses: wertycn/kuboard-deploy-action@v1.0.0
+        with:
+          user: "wertycn"             # 'kuboard user name'
+          access_key: "${{ secrets.DEPLOY_ACCESS_KEY }}"       # 'kuboard access key'
+          deploy_namespace: "debug-app" # 'deploy cluster namespace'
+          server_name: "${{ env.PROJECT_NAME }}"      #  'deploy server name'
+          docker_image: "hkccr.ccs.tencentyun.com/debug.icu/${{ env.PROJECT_NAME }}:${{ github.sha }}"     # 'deploy server docker image'
+          deploy_api_url: "${{ secrets.DEPLOY_API_URL }}"   # 'kuboard deploy (ci/cd) api url,eg http://YOUR_DOMAIN/kuboard-api/cluster/YOUR_CLUSTER_NAME/kind/CICDApi/YOUR_KUBOARD_NAME/resource/updateImageTag'
+          deploy_kind: "deployments"      # 'deploy pod kind,default value deployments (deployments,statefulsets,daemonsets,cronjobs,jobs)'
+
